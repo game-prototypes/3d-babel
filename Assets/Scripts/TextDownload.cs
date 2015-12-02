@@ -19,8 +19,10 @@ public class TextDownload : MonoBehaviour {
 
 	//regexp to parse html document
 	private string regexp="<div class = \"bookrealign\" id = \"real\"><PRE id = \"textblock\">[a-z.,\\s]*<\\/PRE><\\/div>";
+	private string titleregex="<\\/form><H3>[a-z,]*<\\/H3>";
 	//result text
-	private string text;
+	private string text="";
+	private string title=""; //title of book (only in first page(
 
 
 			// Use this for initialization
@@ -29,6 +31,7 @@ public class TextDownload : MonoBehaviour {
 		WWW www = new WWW(url);
 		yield return www;
 		Parse(www.text);
+		Debug.Log ("Title:" + title);
 		Debug.Log (text);
 	}
 	
@@ -38,6 +41,14 @@ public class TextDownload : MonoBehaviour {
 		text = res.Groups [0].Value;
 		text=Regex.Replace(text,"<div class = \"bookrealign\" id = \"real\"><PRE id = \"textblock\">\n","");
 		text=Regex.Replace(text,"</PRE></div>","");
+
+		if (page == 1) {
+			regex = new Regex (titleregex);
+			Match res2 = regex.Match (html);
+			title = res2.Groups [0].Value;
+			title = Regex.Replace (title, "</form><H3>", "");
+			title = Regex.Replace (title, "</H3>", "");
+		}
 	}
 
 	string generateUrl(){
