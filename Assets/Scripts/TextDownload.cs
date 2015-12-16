@@ -6,9 +6,9 @@
 using UnityEngine;
 using System.Collections;
 using System.Text.RegularExpressions;
+using UnityEngine.UI;
 
-
-//TODO: parse also title
+	
 public class TextDownload : MonoBehaviour {
 	public string url="https://libraryofbabel.info/book.cgi"; //url of web
 	public string room="2";
@@ -23,7 +23,7 @@ public class TextDownload : MonoBehaviour {
 	//result text
 	private string text="";
 	private string title=""; //title of book (only in first page(
-
+	private Text txt;
 
 			// Use this for initialization
 	IEnumerator Start () {
@@ -33,6 +33,8 @@ public class TextDownload : MonoBehaviour {
 		Parse(www.text);
 		Debug.Log ("Title:" + title);
 		Debug.Log (text);
+		txt = GetComponent<Text> ();
+		txt.text = text;
 	}
 	
 	void Parse(string html){
