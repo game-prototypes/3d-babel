@@ -1,60 +1,73 @@
-﻿/*Text Download for libraryofbabel.info
- * by Andres Ortiz Corrales 
- */
-
-
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System.Text.RegularExpressions;
 using UnityEngine.UI;
 
-	
-public class TextDownload : MonoBehaviour {
-	public string url="https://libraryofbabel.info/book.cgi"; //url of web
-	public string room="2";
-	public int wall=4;
-	public int shelve=2;
-	public int volume=17;
-	public int page = 1;
+public abstract class TextDownload : MonoBehaviour {
+	public static string url="https://libraryofbabel.info/book.cgi"; //url of web
 
 	//regexp to parse html document
-	private string regexp="<div class = \"bookrealign\" id = \"real\"><PRE id = \"textblock\">[a-z.,\\s]*<\\/PRE><\\/div>";
-	private string titleregex="<\\/form><H3>[a-z,]*<\\/H3>";
-	//result text
-	private string text="";
-	private string title=""; //title of book (only in first page(
-	private Text txt;
+	private static string regexp="<div class = \"bookrealign\" id = \"real\"><PRE id = \"textblock\">[a-z.,\\s]*<\\/PRE><\\/div>";
+	private static string titleregex="<\\/form><H3>[a-z,]*<\\/H3>";
 
-			// Use this for initialization
-	IEnumerator Start () {
-		string url = generateUrl();
+
+	private IEnumerator GetPage2 (BookPosition book) {
+		string url = generateUrl(book);
 		WWW www = new WWW(url);
 		yield return www;
-		Parse(www.text);
-		Debug.Log ("Title:" + title);
-		Debug.Log (text);
-		txt = GetComponent<Text> ();
-		txt.text = text;
+		string text=TextDownload.ParsePage(www.text);
+		OnPage (text);
 	}
-	
-	void Parse(string html){
+
+	private IEnumerator GetTitle2 (BookPosition book) {
+		book.page = 1;
+		string url = TextDownload.generateUrl(book);
+		WWW www = new WWW(url);
+		yield return www;
+		string text=TextDownload.ParseTitle(www.text);
+		OnTitle (text);
+	}
+	protected void GetPage(BookPosition book){
+		StartCoroutine(GetPage2 (book));
+	}
+	protected void GetTitle(BookPosition book){
+		StartCoroutine(GetTitle2 (book));
+	}
+
+	protected abstract void OnPage (string page);
+	protected abstract void OnTitle (string title);
+
+
+
+	private static string ParsePage(string html){
+		string text;
 		Regex regex = new Regex (regexp);
 		Match res = regex.Match (html);
 		text = res.Groups [0].Value;
 		text=Regex.Replace(text,"<div class = \"bookrealign\" id = \"real\"><PRE id = \"textblock\">\n","");
 		text=Regex.Replace(text,"</PRE></div>","");
-
-		if (page == 1) {
-			regex = new Regex (titleregex);
-			Match res2 = regex.Match (html);
-			title = res2.Groups [0].Value;
-			title = Regex.Replace (title, "</form><H3>", "");
-			title = Regex.Replace (title, "</H3>", "");
-		}
+		return text;
 	}
-
-	string generateUrl(){
-		string fullUrl = url + "?" + room + "-w" + wall + "-s" + shelve + "-v" + volume + ":" + page;
+	private static string ParseTitle(string html){
+		Regex regex = new Regex (titleregex);
+		Match res = regex.Match (html);
+		string title = res.Groups [0].Value;
+		title = Regex.Replace (title, "</form><H3>", "");
+		title = Regex.Replace (title, "</H3>", "");
+		return title;
+	}
+	private static string generateUrl(BookPosition book){
+		string fullUrl = url + "?" + book.room + "-w" + book.wall + "-s" + book.shelf + "-v" + book.volume + ":" + book.page;
 		return fullUrl;
 	}
+
+}
+
+[System.Serializable]
+public struct BookPosition{
+	public string room;
+	public int wall;
+	public int shelf;
+	public int volume;
+	public int page;
 }
