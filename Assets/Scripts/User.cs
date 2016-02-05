@@ -17,6 +17,7 @@ public class User : MonoBehaviour {
 	}
 
 	void sendAction(GameObject target){
+		Debug.Log (target.name);
 		target.SendMessageUpwards ("Interaction");
 	}
 	//Raycast in camera direction, returns gameobject
