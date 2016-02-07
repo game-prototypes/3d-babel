@@ -57,7 +57,11 @@ public abstract class TextDownload : MonoBehaviour {
 		return title;
 	}
 	private static string generateUrl(BookPosition book){
-		string fullUrl = url + "?" + book.room + "-w" + book.wall + "-s" + book.shelf + "-v" + book.volume + ":" + book.page;
+		string volume = book.volume.ToString ();
+		if (book.volume < 10)
+			volume = "0" + volume;
+		string fullUrl = url + "?" + book.room + "-w" + book.wall + "-s" + book.shelf + "-v" + volume + ":" + book.page;
+		Debug.Log (fullUrl);
 		return fullUrl;
 	}
 

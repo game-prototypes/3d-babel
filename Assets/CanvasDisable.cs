@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+
 public class CanvasDisable : MonoBehaviour {
 
 	// Use this for initialization
