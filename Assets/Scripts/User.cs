@@ -14,6 +14,9 @@ public class User : MonoBehaviour {
 			GameObject obj=GetFrontObject ();
 			if(obj!=null) sendAction (obj);
 		}
+		if (Input.GetKeyDown (KeyCode.Escape)) {
+			Application.Quit();
+		}
 	}
 
 	void sendAction(GameObject target){
